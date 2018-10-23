@@ -1,20 +1,16 @@
-import mysql from 'mysql'
-import { ifError } from 'assert';
+import errorHandler from "errorhandler";
 
+import app from "./index"
 
-var connection = mysql.createConnection({
-    host    :   'localhost',
-    user    :   'root',
-    password    :   '',
-    database    :   'movie_database'
+app.use(errorHandler)
+
+const server = app.listen(app.get("port"), () => {
+    console.log(
+        "   App is running at http://localhost:%d in %s mode",
+        app.get("port"),
+        app.get("env")
+    )
+    console.log("   Press CTRL-C to stop\n")
 })
 
-connection.connect()
-
-connection.query('SELECT 1 + 1 AS solution', (err,rows,fields) => {
-    if (err) throw err
-
-    console.log('The solution is: ', rows[0].solution)
-})
-
-connection.end()
+export default server
