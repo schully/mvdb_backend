@@ -1,14 +1,17 @@
 import fetch from "node-fetch";
 import express from "express";
+import Movie from "./Movie"
 import mysql from "mysql"
 
 const app = express()
+
 const baseUrl = 'http://www.omdbapi.com/?apikey=3227a5fa&i='
+
 
 const connection = mysql.createConnection({
     host:   'localhost',
     user:   'root',
-    database:   'movie_database'
+    database:   'snacksis'
 })
 
 connection.connect((err) => {
@@ -16,60 +19,59 @@ connection.connect((err) => {
         console.error('error: '+err.stack)
         return;
     }
-    console.log('COnnectedBoi')
 
 })
 
-function query(sql){
-    connection.query(sql, (err, rows) =>{
-        if (err) throw err
-    
-        console.log('DataResiecevdMan')
-        console.log(rows);
-        
+function query(sql, values?: any[]){
+    return new Promise((resolve, reject) => {
+        connection.query(sql, values, (err, rows) =>{
+            if (err) reject(err)
+
+            resolve(rows)
+            console.log('DataResiecevdMan')
+            console.log(rows);      
+        })
     })
-    
 }
 
-connection.end((err) => {
-
-})
-
 app.get("/movie/imdb/:id", (req,res) => {
+    
     fetch(baseUrl+req.params.id).then(res => res.json()).then(json => {
         res.end(JSON.stringify(Movie.fromImdbMovie(json)))
     })
 
 })
 
-app.post("/movie/imdb", (req,res) => {
-    res.end('')
+
+app.post("/movie/imdb", async (req,res) => {
+    let mta = ['The Ten Commandments','G']
+    let md = ['Cecil B. DeMille']
+    let mis = ['7.9']
+    let mg1 = ['Adventure']
+    let mg2 = ['Drama']
+    let sqlM = 'INSERT INTO movies (title,age_rated) VALUES (?, ?);'
+    let sqlD = 'INSERT INTO director (name) VALUES (?);'
+    let sqlI = 'INSERT INTO from_imdb (imdb_score) VALUES (?);'
+    let sqlG = 'INSERT INTO genres (name) VALUES (?);'
+
+    try {
+        // await waits for reolve to continue
+        await query(sqlM,mta)
+        await query(sqlD,md)
+        await query(sqlG,mg1)
+        await query(sqlI,mis)
+        await query(sqlG,mg2)
+    } catch (e){
+        console.log(e)
+    }
+    res.end(JSON.stringify({
+        status: "ok"
+    }))
 })
 
-app.listen(8083)
+
+app.listen(8094, () => {
+    console.log("ISON")
+})
 
 export default app
-
-
-
-class Movie {
-    title: string
-    ageRated: number
-    imdbScore?: number
-    director?: string
-    genre: string
-    plot?: string
-    possessor?: string
-
-    static fromImdbMovie(json): Movie{
-        return {
-            title: json.Title,
-            ageRated: json.Rated,
-            imdbScore: json.imdbRating,
-            director: json.Director,
-            genre: json.Genre,
-            possessor: undefined
-        }
-
-    }
-}
