@@ -1,11 +1,19 @@
-import fetch from "node-fetch";
 import express from "express";
-import Movie from "./Movie"
-import mysql from "mysql"
+import cors from 'cors'
+import { db, setupDb } from './db'
 
 const app = express()
 
-const baseUrl = 'http://www.omdbapi.com/?apikey=3227a5fa&i='
+setupDb().then(db =>{
+    const baseUrl = '/api'
+    app.listen(8094, () => {
+        console.log("ISON")
+    })
+    app.use(express.urlencoded({extended: true}))
+    app.use(express.json())
+    app.use(cors())
+})
+
 
 
 const connection = mysql.createConnection({
@@ -37,7 +45,7 @@ function query(sql, values?: any[]){
 app.get("/movie/imdb/:id", (req,res) => {
     
     fetch(baseUrl+req.params.id).then(res => res.json()).then(json => {
-        res.end(JSON.stringify(Movie.fromImdbMovie(json)))
+        res.end(JSON.stringify(Movie(json)))
     })
 
 })
@@ -70,8 +78,6 @@ app.post("/movie/imdb", async (req,res) => {
 })
 
 
-app.listen(8094, () => {
-    console.log("ISON")
-})
+
 
 export default app

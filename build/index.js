@@ -39,13 +39,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var node_fetch_1 = __importDefault(require("node-fetch"));
 var express_1 = __importDefault(require("express"));
-var Movie_1 = __importDefault(require("./Movie"));
-var mysql_1 = __importDefault(require("mysql"));
+var cors_1 = __importDefault(require("cors"));
+var db_1 = require("./db");
 var app = express_1.default();
-var baseUrl = 'http://www.omdbapi.com/?apikey=3227a5fa&i=';
-var connection = mysql_1.default.createConnection({
+db_1.setupDb().then(function (db) {
+    var baseUrl = '/api';
+    app.listen(8094, function () {
+        console.log("ISON");
+    });
+    app.use(express_1.default.urlencoded({ extended: true }));
+    app.use(express_1.default.json());
+    app.use(cors_1.default());
+});
+var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     database: 'snacksis'
@@ -68,8 +75,8 @@ function query(sql, values) {
     });
 }
 app.get("/movie/imdb/:id", function (req, res) {
-    node_fetch_1.default(baseUrl + req.params.id).then(function (res) { return res.json(); }).then(function (json) {
-        res.end(JSON.stringify(Movie_1.default.fromImdbMovie(json)));
+    fetch(baseUrl + req.params.id).then(function (res) { return res.json(); }).then(function (json) {
+        res.end(JSON.stringify(Movie(json)));
     });
 });
 app.post("/movie/imdb", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
@@ -119,7 +126,4 @@ app.post("/movie/imdb", function (req, res) { return __awaiter(_this, void 0, vo
         }
     });
 }); });
-app.listen(8094, function () {
-    console.log("ISON");
-});
 exports.default = app;

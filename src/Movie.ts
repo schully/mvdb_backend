@@ -1,21 +1,14 @@
+import Actor from "./Participant"
+
 export default class Movie {
+    id: any
     title: string
     ageRated: number
     imdbScore?: number
     director?: string
     genre: string
     plot?: string
+    cast?: Actor[] = []
     possessor?: string
 
-    static fromImdbMovie(json): Movie{
-        return {
-            title: json.Title,
-            ageRated: json.Rated,
-            imdbScore: json.imdbRating,
-            director: json.Director,
-            genre: json.Genre,
-            possessor: undefined
-        }
-
-    }
 }
