@@ -34,68 +34,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var node_fetch_1 = __importDefault(require("node-fetch"));
-var Participant_1 = __importDefault(require("./Participant"));
-var omdbApiKey = '3227a5fa';
-var baseUrl = 'http://www.omdbapi.com/?apikey=${omdbApiKey}';
-exports.fetchMovie = function (id) { return __awaiter(_this, void 0, void 0, function () {
-    var url, result, cast, genre;
+/**
+ * @author Daniel Grigore
+ * @param res
+ */
+exports.default = (function (res, blame, message, error) { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                url = baseUrl + "&i=" + encodeURIComponent(id);
-                console.log("req ", url);
-                return [4 /*yield*/, node_fetch_1.default(baseUrl + "&i=" + encodeURIComponent(id))];
-            case 1:
-                result = _a.sent();
-                return [4 /*yield*/, result.json()];
-            case 2:
-                result = _a.sent();
-                if (result.Response == "False") {
-                    return [2 /*return*/, {
-                            result: 'noMatch'
-                        }];
-                }
-                filterMovie(result);
-                cast = getCast(result);
-                genre = (result.Genre || "").split(",").map(function (c) { return c.trim(); });
-                return [2 /*return*/, {
-                        result: {
-                            id: id,
-                            cast: cast,
-                            genre: genre,
-                            imdbId: id,
-                            ageRated: result.Rated,
-                            title: result.Title,
-                            plot: result.Plot,
-                            imdbScore: parseFloat(result.imdbRating)
-                        }
-                    }];
+        if (error) {
+            console.error(error);
         }
+        res.status(blame == 'client' ? 400 : 500).end(JSON.stringify({
+            message: message || (blame == 'client' ? "Bas request" : "Server error")
+        }));
+        return [2 /*return*/];
     });
-}); };
-var filterMovie = function (movie) {
-    ["Rated", "imdbRating"].forEach(function (k) {
-        if (movie[k] == "N/A") {
-            movie[k] = null;
-        }
-    });
-};
-function getCast(imdbMovieResut) {
-    function fromString(str) {
-        if (!str || /N\/A/i.test(str)) {
-            return [];
-        }
-        return str.split(",").map(function (name) { return new Participant_1.default(name.replace(/\(.+\)/g, '').trim(), null); });
-    }
-    var actors = fromString(imdbMovieResut.Actors);
-    actors.forEach(function (worker) { return worker.role = 'cast'; });
-    var director = fromString(imdbMovieResut.Director);
-    actors.forEach(function (worker) { return worker.role = 'director'; });
-    return actors.concat(director);
-}
+}); });

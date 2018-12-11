@@ -17,6 +17,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Movie_1 = __importDefault(require("./Movie"));
+/**
+ * @author Daniel Grigore
+ */
 var IdFromImdb = /** @class */ (function (_super) {
     __extends(IdFromImdb, _super);
     function IdFromImdb() {

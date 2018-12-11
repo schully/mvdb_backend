@@ -1,6 +1,9 @@
 import { readFileSync } from "fs";
 import path from 'path'
 
+/**
+ * @author Daniel Grigore
+ */
 export default {
 
     assertParams: (props: string[], obj: any, allowEmptyString = false) => {
@@ -24,11 +27,11 @@ export default {
         
     },
 
-    getQuery(name) {
-        if (!name.endsWidth('.sql')) {
+    getQuery(name: string) {
+        if (!name.endsWith('.sql')) {
             name += ".sql";
         }
-        return readFileSync(path.resolve(__dirname, '../queries', name)).toString()
+        return readFileSync(path.resolve(__dirname, '../sql', name)).toString()
     },
 
     reobject(original){

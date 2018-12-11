@@ -1,0 +1,1 @@
+INSERT INTO movies (title, imdb_score, runtime, plot, age_rated, possessor) VALUES (?,?,?,?,?,?)

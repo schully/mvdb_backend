@@ -1,17 +1,20 @@
 import mysql from 'mysql'
 
-let _db: mysql.Connection
+let dataBaseConnection: mysql.Connection
 
-export const db = () => _db
+export const db = () => dataBaseConnection
 
 class QueryOptions {
     forceArray?: boolean
     skipObjectIfSingleResult?: boolean;
 }
 
+/**
+ * @author Daniel Grigore
+ */
 export const query = (sql: string, args?: any, opts?: QueryOptions) => 
     new Promise(async (resolve,reject) => {
-        let result = _db.query(sql, Array.isArray(args) ? args : [args], (e, res: any[]) => {
+        let result = dataBaseConnection.query(sql, Array.isArray(args) ? args : [args], (e, res: any[]) => {
             if (!opts) {
                 opts = new QueryOptions()
                 opts.forceArray = false
@@ -49,20 +52,20 @@ export const query = (sql: string, args?: any, opts?: QueryOptions) =>
 export function setupDb() {
     return new Promise(async (resolve, reject) => {
         console.log("setting up db...");
-        _db = await mysql.createConnection({
+        dataBaseConnection = await mysql.createConnection({
             host: 'localhost',
             user: 'root',
             password: '',
             database: 'snacksis'
         })
-        _db.connect(e => {
+        dataBaseConnection.connect(e => {
             if (e) {
                 console.error("DB_ERROR: ",e);
                 reject()
                 return process.exit(1)
             }
 
-            return resolve(_db)
+            return resolve(dataBaseConnection)
         })
     })
 }

@@ -1,12 +1,12 @@
 import fetch from "node-fetch";
-import Movie from "./Movie";
 import ImdbID from "./IdFromImdb";
-import Worker from "./Participant"
 
 const omdbApiKey = '3227a5fa'
-const baseUrl = 'http://www.omdbapi.com/?apikey=${omdbApiKey}'
+const baseUrl = `http://www.omdbapi.com/?apikey=${omdbApiKey}`
 
-
+/**
+ * @author Daniel Grigore 
+ */
 export const fetchMovie = async (id: string): Promise<{result: ImdbID | string}> => {
     let url = `${baseUrl}&i=${encodeURIComponent(id)}`
     console.log("req ", url);
@@ -22,14 +22,17 @@ export const fetchMovie = async (id: string): Promise<{result: ImdbID | string}>
 
     filterMovie(result)
 
-    let cast = getCast(result)
-    let categories = (result.Genre || "").split(",").map(c => c.trim())
+    console.log(result);
+    
+
+    let genre = (result.Genre || "").split(",").map(c => c.trim())
     
     return {
         result: {
-            cast,
-            categories,
+            id,
+            genre,
             imdbId: id,
+            runtime: parseInt(result.Runtime),
             ageRated: result.Rated,
             title: result.Title,
             plot:result.Plot,
@@ -45,24 +48,4 @@ const filterMovie = movie => {
             movie[k] = null
         }
     })
-}
-
-function getCast(imdbMovieResut:any): Worker[]{
-    function fromString(str:string): Worker[] {
-        if (!str || /N\/A/i.test(str)) {
-            return []
-        }
-        return str.split(",").map(name => new Worker(name.replace(/\(.+\)/g, '').trim(), null))
-    }
-
-    let actors = fromString(imdbMovieResut.Actors)
-    actors.forEach(worker => worker.role = 'cast')
-
-    let director = fromString(imdbMovieResut.Actors)
-    actors.forEach(worker => worker.role = 'director')
-    
-    return {
-        ...actors,
-        ...director
-    }
 }

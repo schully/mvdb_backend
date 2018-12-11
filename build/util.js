@@ -5,6 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs_1 = require("fs");
 var path_1 = __importDefault(require("path"));
+/**
+ * @author Daniel Grigore
+ */
 exports.default = {
     assertParams: function (props, obj, allowEmptyString) {
         if (allowEmptyString === void 0) { allowEmptyString = false; }
@@ -24,10 +27,10 @@ exports.default = {
         return fs_1.readFileSync(path_1.default.resolve(filePath)).toString();
     },
     getQuery: function (name) {
-        if (!name.endsWidth('.sql')) {
+        if (!name.endsWith('.sql')) {
             name += ".sql";
         }
-        return fs_1.readFileSync(path_1.default.resolve(__dirname, '../queries', name)).toString();
+        return fs_1.readFileSync(path_1.default.resolve(__dirname, '../sql', name)).toString();
     },
     reobject: function (original) {
         return JSON.parse(JSON.stringify(original));

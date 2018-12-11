@@ -40,11 +40,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var node_fetch_1 = __importDefault(require("node-fetch"));
-var Participant_1 = __importDefault(require("./Participant"));
 var omdbApiKey = '3227a5fa';
-var baseUrl = 'http://www.omdbapi.com/?apikey=${omdbApiKey}';
+var baseUrl = "http://www.omdbapi.com/?apikey=" + omdbApiKey;
+/**
+ * @author Daniel Grigore
+ */
 exports.fetchMovie = function (id) { return __awaiter(_this, void 0, void 0, function () {
-    var url, result, cast, genre;
+    var url, result, genre;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -62,14 +64,14 @@ exports.fetchMovie = function (id) { return __awaiter(_this, void 0, void 0, fun
                         }];
                 }
                 filterMovie(result);
-                cast = getCast(result);
+                console.log(result);
                 genre = (result.Genre || "").split(",").map(function (c) { return c.trim(); });
                 return [2 /*return*/, {
                         result: {
                             id: id,
-                            cast: cast,
                             genre: genre,
                             imdbId: id,
+                            runtime: parseInt(result.Runtime),
                             ageRated: result.Rated,
                             title: result.Title,
                             plot: result.Plot,
@@ -86,16 +88,3 @@ var filterMovie = function (movie) {
         }
     });
 };
-function getCast(imdbMovieResut) {
-    function fromString(str) {
-        if (!str || /N\/A/i.test(str)) {
-            return [];
-        }
-        return str.split(",").map(function (name) { return new Participant_1.default(name.replace(/\(.+\)/g, '').trim(), null); });
-    }
-    var actors = fromString(imdbMovieResut.Actors);
-    actors.forEach(function (worker) { return worker.role = 'cast'; });
-    var director = fromString(imdbMovieResut.Director);
-    actors.forEach(function (worker) { return worker.role = 'director'; });
-    return actors.concat(director);
-}

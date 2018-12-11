@@ -34,68 +34,51 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var node_fetch_1 = __importDefault(require("node-fetch"));
-var Participant_1 = __importDefault(require("./Participant"));
-var omdbApiKey = '3227a5fa';
-var baseUrl = 'http://www.omdbapi.com/?apikey=${omdbApiKey}';
-exports.fetchMovie = function (id) { return __awaiter(_this, void 0, void 0, function () {
-    var url, result, cast, genre;
+var dataBase_1 = require("./dataBase");
+var upColumn = [
+    "title",
+    "runtime",
+    "age_rated",
+    "imdb_score",
+    "plot",
+    "possessor",
+];
+/**
+ * @author Daniel Grigore
+ * @param req
+ * @param res
+ */
+exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+    var body, params, dirty, movieId, _i, upColumn_1, column, colToUp, sql, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                url = baseUrl + "&i=" + encodeURIComponent(id);
-                console.log("req ", url);
-                return [4 /*yield*/, node_fetch_1.default(baseUrl + "&i=" + encodeURIComponent(id))];
+                body = req.body, params = req.params;
+                dirty = [];
+                movieId = params.movieId;
+                if (isNaN(movieId)) {
+                    return [2 /*return*/, res.status(400).end(JSON.stringify({ result: "error", error: "notValidMovieId" }))];
+                }
+                for (_i = 0, upColumn_1 = upColumn; _i < upColumn_1.length; _i++) {
+                    column = upColumn_1[_i];
+                    if (body[column]) {
+                        dirty[column] = body[column];
+                    }
+                    console.log("col", column);
+                }
+                console.log("body", body);
+                console.log("dirty", dirty);
+                colToUp = Object.keys(dirty);
+                if (Object.keys(colToUp).length == 0) {
+                    return [2 /*return*/, res.status(400).end(JSON.stringify({ result: "error", error: "noChange" }))];
+                }
+                sql = ("UPDATE movies SET " + colToUp.map(function (e) { return e + "=?"; }).join(",") + " WHERE id = ?");
+                return [4 /*yield*/, dataBase_1.query(sql, colToUp.map(function (e) { return dirty[e]; }).concat([movieId]))];
             case 1:
                 result = _a.sent();
-                return [4 /*yield*/, result.json()];
-            case 2:
-                result = _a.sent();
-                if (result.Response == "False") {
-                    return [2 /*return*/, {
-                            result: 'noMatch'
-                        }];
-                }
-                filterMovie(result);
-                cast = getCast(result);
-                genre = (result.Genre || "").split(",").map(function (c) { return c.trim(); });
-                return [2 /*return*/, {
-                        result: {
-                            id: id,
-                            cast: cast,
-                            genre: genre,
-                            imdbId: id,
-                            ageRated: result.Rated,
-                            title: result.Title,
-                            plot: result.Plot,
-                            imdbScore: parseFloat(result.imdbRating)
-                        }
-                    }];
+                return [2 /*return*/, res.status(200).end(JSON.stringify({ result: "ok", "ok": true }))];
         }
     });
-}); };
-var filterMovie = function (movie) {
-    ["Rated", "imdbRating"].forEach(function (k) {
-        if (movie[k] == "N/A") {
-            movie[k] = null;
-        }
-    });
-};
-function getCast(imdbMovieResut) {
-    function fromString(str) {
-        if (!str || /N\/A/i.test(str)) {
-            return [];
-        }
-        return str.split(",").map(function (name) { return new Participant_1.default(name.replace(/\(.+\)/g, '').trim(), null); });
-    }
-    var actors = fromString(imdbMovieResut.Actors);
-    actors.forEach(function (worker) { return worker.role = 'cast'; });
-    var director = fromString(imdbMovieResut.Director);
-    actors.forEach(function (worker) { return worker.role = 'director'; });
-    return actors.concat(director);
-}
+}); });

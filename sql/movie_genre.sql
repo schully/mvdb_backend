@@ -1,0 +1,1 @@
+SELECT name FROM movie_genre WHERE id = ?
