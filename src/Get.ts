@@ -19,12 +19,6 @@ export const getMovie = async (req: Request, res: Response) => {
         if (!movie) {
             return res.status(401).end(JSON.stringify({result: 'noMatch'}))
         }
-        let genre = await query(util.getQuery("movie_genre"),[id],{
-            forceArray: true,
-            skipObjectIfSingleResult: true
-        }) as string[]
-
-        movie.genre = genre
 
         res.status(200).end(JSON.stringify(movie))
     } catch (error) {

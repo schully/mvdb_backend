@@ -49,34 +49,27 @@ var util_1 = __importDefault(require("./util"));
  * @param res
  */
 exports.getMovie = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var id, movie, genre, error_1;
+    var id, movie, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 id = req.params.id;
                 _a.label = 1;
             case 1:
-                _a.trys.push([1, 4, , 5]);
+                _a.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, dataBase_1.query(util_1.default.getQuery("movie"), [id], { forceArray: false })];
             case 2:
                 movie = _a.sent();
                 if (!movie) {
                     return [2 /*return*/, res.status(401).end(JSON.stringify({ result: 'noMatch' }))];
                 }
-                return [4 /*yield*/, dataBase_1.query(util_1.default.getQuery("movie_genre"), [id], {
-                        forceArray: true,
-                        skipObjectIfSingleResult: true
-                    })];
-            case 3:
-                genre = _a.sent();
-                movie.genre = genre;
                 res.status(200).end(JSON.stringify(movie));
-                return [3 /*break*/, 5];
-            case 4:
+                return [3 /*break*/, 4];
+            case 3:
                 error_1 = _a.sent();
                 errorHandler_1.default(res, 'server', null, error_1);
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };

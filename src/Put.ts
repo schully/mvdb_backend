@@ -12,8 +12,6 @@ let upColumn = [
 
 /**
  * @author Daniel Grigore
- * @param req 
- * @param res 
  */
 export default async (req: Request, res: Response) => {
     let { body, params } = req
@@ -22,6 +20,18 @@ export default async (req: Request, res: Response) => {
 
     if (isNaN(movieId)) {
         return res.status(400).end(JSON.stringify({ result: "error", error: "notValidMovieId" }))
+    }
+
+    if ("ageRated" in body) {
+        //  Make column-friendly
+        body["age_rated"] = body["ageRated"];
+        delete body["ageRated"];
+    }
+    
+    if ("imdbScore" in body) {
+        //  Make column-friendly
+        body["imdb_score"] = body["imdbScore"];
+        delete body["imdbScore"];
     }
 
     for (let column of upColumn) {
@@ -44,7 +54,13 @@ export default async (req: Request, res: Response) => {
 
     let sql = (`UPDATE movies SET ${colToUp.map(e => `${e}=?`).join(",")} WHERE id = ?`)
 
-    let result = await query(sql, [...colToUp.map(e => dirty[e]), movieId])
+    try {
+        await query(sql, [...colToUp.map(e => dirty[e]), movieId])
+    } catch (e) {
+        console.log(e)
+
+        return res.status(500).end(JSON.stringify({ result: "error", "ok": false }))
+    }
 
     return res.status(200).end(JSON.stringify({ result: "ok", "ok": true }))
 }

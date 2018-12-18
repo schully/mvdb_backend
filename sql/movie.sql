@@ -1,9 +1,12 @@
 SELECT
-    id,
+    movies.id,
     title,
-    runtime,
-    plot,
-    imdb_score,
     age_rated,
-    possessor
-FROM movies WHERE id = ?
+    runtime,
+    imdb_score,
+    plot,
+    possessor,
+    movie_genre.name AS genre
+FROM movies
+    JOIN movie_genre ON movie_genre.id = movies.genre_id
+    WHERE movies.id = ?

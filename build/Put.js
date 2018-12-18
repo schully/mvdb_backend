@@ -47,11 +47,9 @@ var upColumn = [
 ];
 /**
  * @author Daniel Grigore
- * @param req
- * @param res
  */
 exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var body, params, dirty, movieId, _i, upColumn_1, column, colToUp, sql, result;
+    var body, params, dirty, movieId, _i, upColumn_1, column, colToUp, sql, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -60,6 +58,16 @@ exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0,
                 movieId = params.movieId;
                 if (isNaN(movieId)) {
                     return [2 /*return*/, res.status(400).end(JSON.stringify({ result: "error", error: "notValidMovieId" }))];
+                }
+                if ("ageRated" in body) {
+                    //  Make column-friendly
+                    body["age_rated"] = body["ageRated"];
+                    delete body["ageRated"];
+                }
+                if ("imdbScore" in body) {
+                    //  Make column-friendly
+                    body["imdb_score"] = body["imdbScore"];
+                    delete body["imdbScore"];
                 }
                 for (_i = 0, upColumn_1 = upColumn; _i < upColumn_1.length; _i++) {
                     column = upColumn_1[_i];
@@ -75,10 +83,18 @@ exports.default = (function (req, res) { return __awaiter(_this, void 0, void 0,
                     return [2 /*return*/, res.status(400).end(JSON.stringify({ result: "error", error: "noChange" }))];
                 }
                 sql = ("UPDATE movies SET " + colToUp.map(function (e) { return e + "=?"; }).join(",") + " WHERE id = ?");
-                return [4 /*yield*/, dataBase_1.query(sql, colToUp.map(function (e) { return dirty[e]; }).concat([movieId]))];
+                _a.label = 1;
             case 1:
-                result = _a.sent();
-                return [2 /*return*/, res.status(200).end(JSON.stringify({ result: "ok", "ok": true }))];
+                _a.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, dataBase_1.query(sql, colToUp.map(function (e) { return dirty[e]; }).concat([movieId]))];
+            case 2:
+                _a.sent();
+                return [3 /*break*/, 4];
+            case 3:
+                e_1 = _a.sent();
+                console.log(e_1);
+                return [2 /*return*/, res.status(500).end(JSON.stringify({ result: "error", "ok": false }))];
+            case 4: return [2 /*return*/, res.status(200).end(JSON.stringify({ result: "ok", "ok": true }))];
         }
     });
 }); });
